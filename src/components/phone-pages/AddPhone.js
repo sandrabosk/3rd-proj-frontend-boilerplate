@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import { Redirect } from "react-router-dom";
 
 class AddPhone extends Component {
        constructor(props){
@@ -21,7 +22,19 @@ class AddPhone extends Component {
         }
 
         uploadImage(event){
-            console.log("upload image: ", event.target);
+            // console.log("upload image: ", event.target.files);
+            const { files } = event.target;    
+            const uploadData = new FormData();
+
+            uploadData.append("submittedFile", files[0]);
+
+            axios.post(
+                "http://localhost:3001/api/upload-file",
+                uploadData,
+                { withCredentials: true }
+            )
+            .then( response  => this.setState({ image:response.data.fileUrl }))
+            .catch( err => console.log(err) );
         }
 
         syncSpec(event, index){
@@ -43,13 +56,20 @@ class AddPhone extends Component {
             )
             .then( response => {
                 console.log("new phone: ", response.data);
-                this.setState({ isSubmitSuccessful: true })
+                this.setState({ isSubmitSuccessful: true });
             } )
             .catch( err => console.log(err) );
         }
 
 
        render(){
+            if(!this.props.currentUser){
+                return <Redirect to="/login-page" />
+            }
+
+           if(this.state.isSubmitSuccessful){
+               return <Redirect to="/phone-list" />
+           }
            return(
                <section>
                    <h2> Add a phone </h2>
@@ -86,6 +106,8 @@ class AddPhone extends Component {
                             onChange={ e => this.uploadImage(e) }
                             type= "file"
                         />
+                        <br />
+                        <img width="200"  src={ this.state.image }  />
                         <br />
                         <label> Specs </label>
                         <br />
