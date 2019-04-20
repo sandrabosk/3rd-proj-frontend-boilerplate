@@ -10,6 +10,7 @@ import Login from './components/user-pages/Login';
 import Home from './components/Home';
 
 
+import AddPhone from './components/phone-pages/AddPhone';
 
 class App extends Component {
   constructor(){
@@ -41,13 +42,22 @@ class App extends Component {
         <header>
          <h1> IronPhones ☎ </h1>
          <nav>
-
+          {/* Home will be always visible to everyone */}
             <NavLink to="/"> Home </NavLink>
 
+          { this.state.currentUser ? (
+            // these pages will be visible only if the user exists
+            <NavLink to="/add-phone"> Add a Phone </NavLink>
+          ) : (
+            // these pages will be visible only if there is no user in the session
+            <span>
+              <NavLink to="/signup-page"> Signup </NavLink>
+              <NavLink to="/login-page"> Login </NavLink>
+            </span>
+          ) }
 
 
-           <NavLink to="/signup-page"> Signup </NavLink>
-           <NavLink to="/login-page"> Login </NavLink>
+           
          </nav>
         </header>
 
@@ -57,7 +67,10 @@ class App extends Component {
         <Route exact path="/" component={ Home } />
 
 
-         {/*  */}
+         {/* this way we use when we are passing params down to componentDidMount() {
+           so we can't use component={}, but instead we have to use render ={() => <someComponent/>}
+         }
+          */}
           <Route path="/signup-page" render={ () => 
             <Signup currentUser={this.state.currentUser} 
             onUserChange={ userDoc => this.syncCurrentUser(userDoc) }   />
@@ -68,6 +81,8 @@ class App extends Component {
             <Login currentUser={ this.state.currentUser } 
             onUserChange={userDoc => this.syncCurrentUser(userDoc)} />
           }  />
+
+          <Route path="/add-phone" component={ AddPhone }/>
           
         </Switch>
 
